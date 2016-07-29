@@ -35,7 +35,7 @@
       (run-query session "CREATE (a:Person {name:'Arthur', title:'King'})")
       (doseq [r  (run-query session
                             "MATCH (a:Person) WHERE a.name = {name}
-                          RETURN a.name AS name, a.title AS title"
+                             RETURN a.name AS name, a.title AS title"
                             {"name" "Arthur"})]
         (println r)))))
 

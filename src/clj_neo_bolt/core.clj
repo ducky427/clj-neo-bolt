@@ -5,7 +5,7 @@
            (java.util Map))
   (:gen-class))
 
-(defn get-driver
+(defn connect
   (^Driver [^String url]
    (GraphDatabase/driver url))
   (^Driver [^String url ^String username ^String password]
@@ -13,13 +13,13 @@
   (^Driver [^String url ^String username ^String password ^Config config]
    (GraphDatabase/driver url (AuthTokens/basic username password) config)))
 
-(defn get-session
+(defn create-session
   ^Session [^Driver driver]
   (.session driver))
 
-(defn run-query
+(defn query
   ([^Session session ^String qry]
-   (run-query session qry {}))
+   (query session qry {}))
   ([^Session session ^String qry ^Map params]
    (map (fn [^Record r]
           (into {} (.asMap r)))
@@ -30,13 +30,13 @@
 
 (defn run-example
   []
-  (with-open [driver  (get-driver "bolt://localhost")]
-    (with-open [session (get-session driver)]
-      (run-query session "CREATE (a:Person {name:'Arthur', title:'King'})")
-      (doseq [r  (run-query session
-                            "MATCH (a:Person) WHERE a.name = {name}
+  (with-open [driver  (connect "bolt://localhost")]
+    (with-open [session (create-session driver)]
+      (query session "CREATE (a:Person {name:'Arthur', title:'King'})")
+      (doseq [r  (query session
+                        "MATCH (a:Person) WHERE a.name = {name}
                              RETURN a.name AS name, a.title AS title"
-                            {"name" "Arthur"})]
+                        {"name" "Arthur"})]
         (println r)))))
 
 (defn -main
